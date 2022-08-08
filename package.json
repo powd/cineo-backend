@@ -3,7 +3,6 @@
   "version": "0.0.1",
   "description": "Backend for a film aggregator app",
   "author": "powd",
-  "private": false,
   "license": "MIT",
   "scripts": {
     "prebuild": "rimraf dist",
