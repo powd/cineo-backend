@@ -1,2 +1,2 @@
-export * from './generate-id';
+export { generateId } from './generate-id';
 export * from './injectable';
