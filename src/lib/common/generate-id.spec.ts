@@ -15,16 +15,16 @@ type CryptoWithSelectedOverloads = Omit<typeof crypto, 'randomInt'> & {
 
 const mockedCrypto = crypto as any as jest.Mocked<CryptoWithSelectedOverloads>;
 
+const pseudorandomIntegers = [
+  18, 15, 41, 6, 30, 13, 13, 52, 13, 51, 14, 38, 30, 17, 52, 30, 33, 40, 53, 20,
+  41, 2, 52, 22, 29, 6, 24, 43, 34, 4, 9, 32, 41, 21, 51, 56, 41, 30, 4, 28, 7,
+  13, 12, 17, 12, 47, 47, 33, 31, 37, 25, 22, 44, 33, 37, 36, 5, 15, 14, 16, 24,
+  50, 14, 35, 51, 45, 19, 36, 48, 0, 1, 13, 39, 36, 9, 46, 30, 43, 49, 6, 38, 9,
+  24, 56, 13, 12, 28, 18, 10, 42, 17, 25, 25, 10, 17, 2, 22, 47, 19, 7,
+];
+
 describe('generateId', () => {
   function mockReturnValuesForRandomInt() {
-    const pseudorandomIntegers = [
-      5, 47, 46, 7, 0, 7, 22, 50, 21, 27, 36, 35, 48, 50, 38, 26, 14, 39, 27,
-      29, 13, 34, 21, 48, 38, 21, 6, 30, 40, 7, 4, 6, 9, 45, 3, 59, 45, 57, 32,
-      43, 22, 15, 6, 20, 45, 58, 47, 30, 33, 11, 6, 59, 20, 47, 32, 45, 42, 51,
-      30, 14, 6, 19, 22, 2, 20, 19, 54, 17, 57, 48, 2, 25, 34, 42, 16, 20, 37,
-      28, 9, 35, 40, 19, 26, 14, 1, 17, 49, 56, 32, 49, 10, 15, 50, 56, 15, 22,
-      48, 47, 52, 15,
-    ];
     pseudorandomIntegers.forEach((integer) =>
       mockedCrypto.randomInt.mockReturnValueOnce(integer),
     );
@@ -33,6 +33,11 @@ describe('generateId', () => {
   it('should use correctly tweaked parameters', () => {
     // Then
     expect(ID_LENGTH).toBeGreaterThan(0);
+    expect(
+      pseudorandomIntegers.every(
+        (p) => MINIMAL_RANDOM_INT <= p && p < MAXIMAL_RANDOM_INT,
+      ),
+    ).toEqual(true);
     expect(MINIMAL_RANDOM_INT).toBeLessThanOrEqual(MAXIMAL_RANDOM_INT);
     expect(ALLOWED_CHARACTERS.length).toBe(MAXIMAL_RANDOM_INT);
   });
@@ -43,17 +48,12 @@ describe('generateId', () => {
   });
 
   it('should not use similar characters that might confuse the human reader', () => {
-    // Given
-    const allowedCharacterContains = (character: string) =>
-      ALLOWED_CHARACTERS.indexOf(character) !== -1;
-
     // Then
-    expect(allowedCharacterContains('I') && allowedCharacterContains('l')).toBe(
-      false,
-    );
-    expect(allowedCharacterContains('0') && allowedCharacterContains('O')).toBe(
-      false,
-    );
+    expect(ALLOWED_CHARACTERS).not.toContain('I');
+    expect(ALLOWED_CHARACTERS).not.toContain('l');
+
+    expect(ALLOWED_CHARACTERS).not.toContain('0');
+    expect(ALLOWED_CHARACTERS).not.toContain('O');
   });
 
   it('should generate ids of just enough length to beat git oids (commit hashes) in terms of cardinality', () => {
@@ -95,6 +95,6 @@ describe('generateId', () => {
     const id = generateId();
 
     // Then
-    expect(id).toEqual('6NM818nQmsBAOQDrfEsuezmODm7v');
+    expect(id).toEqual('jgH7weeUeTfEwiUwzGVmH3Uov7qK');
   });
 });
